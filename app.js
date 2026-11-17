@@ -205,16 +205,40 @@ $('downloadBoard').onclick=async()=>{
 };
 
 const imagesBoard=setupImagesBoard();
-function showImageSection(active){
- document.querySelector('.workspace').hidden=active;
- document.querySelector('.titlebar').hidden=active;
- $('imageBoardPanel').hidden=!active;
- document.querySelector('main>footer').hidden=active;
- for(const [id,value] of [['paperMode','paper'],['tuteMode','tute'],['ownMode','own'],['imageBoardMode','images']]){
-  const selected=active?value==='images':value===mode;$(id).classList.toggle('active',selected);$(id).setAttribute('aria-pressed',selected);
+const pdfBoardMode=document.createElement('button');
+pdfBoardMode.id='pdfBoardMode';
+pdfBoardMode.type='button';
+pdfBoardMode.setAttribute('aria-pressed','false');
+pdfBoardMode.innerHTML='▧ PDF to Board <small>Crop questions → .ty pages</small>';
+$('imageBoardMode').insertAdjacentElement('afterend',pdfBoardMode);
+const pdfBoardPanel=document.createElement('section');
+pdfBoardPanel.id='pdfBoardPanel';
+pdfBoardPanel.className='pdf-board-panel';
+pdfBoardPanel.hidden=true;
+pdfBoardPanel.setAttribute('aria-label','PDF to Board');
+const pdfBoardFrame=document.createElement('iframe');
+pdfBoardFrame.title='PDF to Board';
+pdfBoardFrame.dataset.src='./pdf-cropper/index.html';
+pdfBoardFrame.setAttribute('allow','clipboard-write');
+pdfBoardPanel.append(pdfBoardFrame);
+$('imageBoardPanel').insertAdjacentElement('afterend',pdfBoardPanel);
+function showSection(section){
+ const toolOnly=section==='images'||section==='pdf';
+ document.querySelector('.workspace').hidden=toolOnly;
+ document.querySelector('.titlebar').hidden=toolOnly;
+ $('imageBoardPanel').hidden=section!=='images';
+ pdfBoardPanel.hidden=section!=='pdf';
+ document.querySelector('main>footer').hidden=toolOnly;
+ for(const [id,value] of [['paperMode','paper'],['tuteMode','tute'],['ownMode','own'],['imageBoardMode','images'],['pdfBoardMode','pdf']]){
+  const selected=section===value;$(id).classList.toggle('active',selected);$(id).setAttribute('aria-pressed',selected);
  }
 }
-$('imageBoardMode').onclick=()=>{if(!busy&&!imagesBoard.isBusy())showImageSection(true);};
+$('imageBoardMode').onclick=()=>{if(!busy&&!imagesBoard.isBusy())showSection('images');};
+pdfBoardMode.onclick=()=>{
+ if(busy||imagesBoard.isBusy())return;
+ if(!pdfBoardFrame.hasAttribute('src'))pdfBoardFrame.src=pdfBoardFrame.dataset.src;
+ showSection('pdf');
+};
 for(const [id,value] of [['paperMode','paper'],['tuteMode','tute'],['ownMode','own']]){
- $(id).onclick=async()=>{if(busy||imagesBoard.isBusy())return;await changeMode(value);showImageSection(false);};
+ $(id).onclick=async()=>{if(busy||imagesBoard.isBusy())return;await changeMode(value);showSection(value);};
 }

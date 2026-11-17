@@ -32,6 +32,8 @@ Relative asset paths support repository subpaths and custom domains.
 - Images to Board: කලින් කපාගත් PNG/JPG/WebP images එකවර upload කිරීම.
   Filename order, page preview, move up/down, remove, add more images.
   Image එකකට වෙනම page එකක් සහිත .ty file එකක් download කරන්න.
+- PDF to Board: Crop questions from a PDF and export them as Smart Board .ty pages.
+  This add-on loads on demand from `pdf-cropper/` and uses PDF.js and JSZip from CDN.
 
 ## Smart Board export
 
